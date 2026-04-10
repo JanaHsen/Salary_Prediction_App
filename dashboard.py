@@ -54,35 +54,6 @@ def load_predictions():
 raw_df   = load_raw_data()
 clean_df = load_clean_data()
 
-# ── Sidebar ───────────────────────────────────────────────────────────────────
-st.sidebar.title("💼 Predict Your Salary")
-st.sidebar.markdown("Fill in your profile:")
-
-experience = st.sidebar.selectbox(
-    "Experience Level",
-    options=['EN', 'MI', 'SE', 'EX'],
-    format_func=lambda x: {'EN': 'Entry', 'MI': 'Mid', 'SE': 'Senior', 'EX': 'Executive'}[x]
-)
-job_title = st.sidebar.selectbox(
-    "Job Title",
-    options=[
-        'Data Scientist', 'Data Engineer', 'Data Analyst',
-        'Machine Learning Engineer', 'Research Scientist',
-        'Data Science Manager', 'ML Engineer', 'Data Architect',
-        'Applied Data Scientist', 'Principal Data Scientist'
-    ]
-)
-location = st.sidebar.selectbox(
-    "Company Location",
-    options=['US', 'GB', 'DE', 'IN', 'CA', 'FR', 'ES', 'Other']
-)
-company_size = st.sidebar.selectbox(
-    "Company Size",
-    options=['S', 'M', 'L'],
-    format_func=lambda x: {'S': 'Small', 'M': 'Medium', 'L': 'Large'}[x]
-)
-predict_btn = st.sidebar.button("Predict Salary", type="primary")
-
 # ── Title ─────────────────────────────────────────────────────────────────────
 st.title("💼 Data Science Salary Landscape")
 st.markdown("*Exploring who earns what, why, and what the data reveals.*")
@@ -181,76 +152,11 @@ st.divider()
 
 # ── Section 3: Prediction ─────────────────────────────────────────────────────
 st.subheader("Your Salary Prediction")
-
-if predict_btn:
-    with st.spinner("Calling model and generating analysis... this may take up to 2 minutes."):
-        try:
-            response = requests.get(
-                f"{API_BASE_URL}/predict",
-                params={
-                    "experience_level": experience,
-                    "job_title":        job_title,
-                    "company_location": location,
-                    "company_size":     company_size
-                },
-                timeout=200
-            )
-            response.raise_for_status()
-            result    = response.json()
-            salary    = result['predicted_salary_usd']
-            narrative = result['llm_narrative']
-
-            # Salary display
-            st.success(f"### Predicted Salary: ${salary:,.0f} USD")
-
-            col1, col2 = st.columns(2)
-
-            with col1:
-                st.markdown("**Your Profile**")
-                exp_labels  = {'EN': 'Entry', 'MI': 'Mid', 'SE': 'Senior', 'EX': 'Executive'}
-                size_labels = {'S': 'Small', 'M': 'Medium', 'L': 'Large'}
-                st.markdown(f"""
-- **Role:** {job_title}
-- **Experience:** {exp_labels[experience]}
-- **Location:** {location}
-- **Company Size:** {size_labels[company_size]}
+st.info("""
+To generate a new prediction:
+1. Call the API directly: [Salary Predictor API](https://salarypredictionapp-production.up.railway.app/predict?experience_level=SE&job_title=Data%20Scientist&company_location=US&company_size=M)
+2. Results are automatically saved and appear in the Prediction History below.
 """)
-
-            with col2:
-                # Prediction in context
-                loc_group = 'US' if location == 'US' else 'GB' if location == 'GB' else 'Other'
-                similar   = clean_df[
-                    (clean_df['experience_level'] == experience) &
-                    (clean_df['location_group'] == loc_group)
-                ]['salary_in_usd']
-
-                if len(similar) > 0:
-                    fig, ax = plt.subplots(figsize=(6, 3))
-                    ax.hist(similar, bins=20, color='steelblue',
-                            edgecolor='white', alpha=0.7, label='Similar profiles')
-                    ax.axvline(salary, color='red', linewidth=2,
-                               linestyle='--', label=f'Your prediction')
-                    ax.set_title('Where You Land')
-                    ax.set_xlabel('Salary (USD)')
-                    ax.xaxis.set_major_formatter(
-                        plt.FuncFormatter(lambda x, _: f'${x/1000:.0f}k'))
-                    ax.legend()
-                    st.pyplot(fig)
-                    plt.close()
-
-            # LLM Narrative
-            st.markdown("---")
-            st.markdown("**AI Market Analysis**")
-            st.markdown(narrative)
-
-        except requests.exceptions.ConnectionError:
-            st.error("FastAPI is not running. Start it with: uvicorn api:app --reload")
-        except Exception as e:
-            st.error(f"Something went wrong: {e}")
-else:
-    st.info("Fill in your profile in the sidebar and click **Predict Salary**.")
-
-st.divider()
 
 # ── Section 4: Prediction History ────────────────────────────────────────────
 st.subheader("Prediction History")
@@ -283,3 +189,5 @@ else:
 
 st.divider()
 st.caption(f"Data: ds_salaries.csv — {len(clean_df)} records | Model: Decision Tree Regressor | R²: 0.41")
+
+#https://salarypredictionapp-jsqyl8fejrxmwqxmaksyx6.streamlit.app/
