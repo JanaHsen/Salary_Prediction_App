@@ -182,7 +182,15 @@ else:
         }),
         use_container_width=True
     )
-
+# Show narratives below table
+st.markdown("---")
+st.markdown("**AI Market Analysis — Latest Predictions**")
+for _, row in predictions_df.head(5).iterrows():
+    with st.expander(f"{row['job_title']} | {row['experience_level']} | {row['company_location']} — ${row['predicted_salary_usd']:,.0f}"):
+        if row['llm_narrative']:
+            st.markdown(row['llm_narrative'])
+        else:
+            st.caption("No narrative yet.")
 st.divider()
 st.caption(f"Data: ds_salaries.csv — {len(clean_df)} records | Model: Decision Tree Regressor | R²: 0.41")
 
