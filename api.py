@@ -57,7 +57,8 @@ def push_to_supabase(record: dict):
         print("Supabase push successful")
     except Exception as e:
         print(f"Supabase push failed: {e}")
-
+VALID_EXPERIENCE   = ['EN', 'MI', 'SE', 'EX']
+VALID_COMPANY_SIZE = ['S', 'M', 'L']
 @app.get("/predict")
 def predict(
     experience_level: str = Query(..., description="EN, MI, SE, EX"),
