@@ -152,11 +152,7 @@ st.divider()
 
 # ── Section 3: Prediction ─────────────────────────────────────────────────────
 st.subheader("Your Salary Prediction")
-st.info("""
-To generate a new prediction:
-1. Call the API directly: [Salary Predictor API](https://salarypredictionapp-production.up.railway.app/predict?experience_level=SE&job_title=Data%20Scientist&company_location=US&company_size=M)
-2. Results are automatically saved and appear in the Prediction History below.
-""")
+st.info("Predictions are generated via the API and appear in the Prediction History below.")
 
 # ── Section 4: Prediction History ────────────────────────────────────────────
 st.subheader("Prediction History")
