@@ -118,7 +118,7 @@ with col2:
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'${x/1000:.0f}k'))
     st.pyplot(fig)
     plt.close()
-    st.caption("US median $135k vs GB $78k vs Other $59k — location dominates.")
+    st.caption("US median $135k is higher than the rest — location dominates.")
 
 # Row 2: Company size and Year
 col1, col2 = st.columns(2)
