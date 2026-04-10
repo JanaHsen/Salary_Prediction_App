@@ -47,15 +47,16 @@ def group_location(loc: str) -> str:
 
 def push_to_supabase(record: dict):
     try:
-        url    = os.getenv("SUPABASE_URL")
-        key    = os.getenv("SUPABASE_KEY")
+        url = os.environ.get("SUPABASE_URL")
+        key = os.environ.get("SUPABASE_KEY")
+        if not url or not key:
+            print(f"Supabase env vars missing. URL: {bool(url)}, KEY: {bool(key)}")
+            return
         client = create_client(url, key)
         client.table("predictions").insert(record).execute()
+        print("Supabase push successful")
     except Exception as e:
         print(f"Supabase push failed: {e}")
-
-VALID_EXPERIENCE   = ['EN', 'MI', 'SE', 'EX']
-VALID_COMPANY_SIZE = ['S', 'M', 'L']
 
 @app.get("/predict")
 def predict(
