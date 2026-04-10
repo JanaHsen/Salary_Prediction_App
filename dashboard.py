@@ -183,14 +183,23 @@ else:
         use_container_width=True
     )
 # Show narratives below table
+# Show narratives below table
 st.markdown("---")
 st.markdown("**AI Market Analysis — Latest Predictions**")
-for _, row in predictions_df.head(5).iterrows():
-    with st.expander(f"{row['job_title']} | {row['experience_level']} | {row['company_location']} — ${row['predicted_salary_usd']:,.0f}"):
-        if row['llm_narrative']:
+
+# Drop duplicates keeping most recent, only show rows with narrative
+narrative_df = predictions_df[predictions_df['llm_narrative'].notna()]
+narrative_df = narrative_df.drop_duplicates(
+    subset=['job_title', 'experience_level', 'company_location', 'company_size'],
+    keep='first'
+)
+
+if narrative_df.empty:
+    st.info("No narratives yet.")
+else:
+    for _, row in narrative_df.head(8).iterrows():
+        with st.expander(f"{row['job_title']} | {row['experience_level']} | {row['company_location']} — ${row['predicted_salary_usd']:,.0f}"):
             st.markdown(row['llm_narrative'])
-        else:
-            st.caption("No narrative yet.")
 st.divider()
 st.caption(f"Data: ds_salaries.csv — {len(clean_df)} records | Model: Decision Tree Regressor | R²: 0.41")
 
